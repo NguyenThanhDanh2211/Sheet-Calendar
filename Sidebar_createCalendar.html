@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <!-- Import Google Icon Font -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <!-- Compiled and minified CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <?!= include("style"); ?>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div id="notification"></div>
+        <div class="input-field col s12">
+          <i class="material-icons prefix">title</i>
+          <input id="name" type="text" class="validate" />
+          <label for="name">Tên lớp</label>
+        </div>
+        <div class="input-field col s12">
+          <select id="semester" name="semester">
+            <option value="HK1">HK1</option>
+            <option value="HK2">HK2</option>
+            <option value="HK3">HK3</option>
+            <option value="HK4">HK4</option>
+          </select>
+          <label for="semester">Học kỳ</label>
+        </div>
+        <p>Ngày bắt đầu:</p>
+        <div class="input-field col s12">
+          <i class="material-icons prefix">timer</i>
+          <input id="start" type="date" class="validate" />
+          <label for="start">Ngày bắt đầu</label>
+        </div>
+        <p>Giờ bắt đầu:</p>
+        <div class="input-field col s12">
+          <i class="material-icons prefix">timer</i>
+          <input id="startt" type="time" class="validate" />
+          <label for="startt">Giờ bắt đầu</label>
+        </div>
+        <p>Giờ kết thúc:</p>
+        <div class="input-field col s12">
+          <i class="material-icons prefix">timer_off</i>
+          <input id="endt" type="time" class="validate" />
+          <label for="endt">Giờ kết thúc</label>
+        </div>
+        <div class="col s12">
+          <button
+            id="addEvent"
+            class="btn waves-effect waves-light"
+            type="submit"
+            name="action"
+          >
+            Thêm
+            <i class="material-icons right">send</i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
+      });
+
+      var btnAdd = document.getElementById('addEvent');
+      btnAdd.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        var form = {
+          name: document.getElementById('name').value,
+          semester: document.getElementById('semester').value,
+          startDate: document.getElementById('start').value,
+          startTime: document.getElementById('startt').value,
+          endTime: document.getElementById('endt').value,
+        };
+
+        google.script.run
+          .withSuccessHandler(function () {
+            document.getElementById('notification').innerHTML =
+              '<p>Tạo thời khóa biểu thành công!<p>';
+          })
+          .createEvent(form);
+      });
+    </script>
+  </body>
+</html>

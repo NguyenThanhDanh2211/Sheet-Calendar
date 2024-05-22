@@ -15,8 +15,7 @@ function downloadCalendar() {
       'Tuần',
       'Từ ngày',
       'Đến ngày',
-      'Giờ bắt đầu',
-      'Giờ kết thúc',
+      'Giờ học',
       'Thứ 2',
       'Thứ 3',
       'Thứ 4',
@@ -25,6 +24,7 @@ function downloadCalendar() {
       'Thứ 7',
     ],
   ];
+
   // Duyệt qua các tuần trong khoảng thời gian từ startDate đến endDate
   var currentDate = new Date(startDate);
   var weekNumber = 1;
@@ -41,30 +41,39 @@ function downloadCalendar() {
     });
 
     if (weekEvents.length > 0) {
-      // Chỉ thêm tuần nếu có sự kiện trong tuần đó
-      var eventDetails = ['', '', '', '', '', '']; // Tạo một mảng rỗng cho các ngày trong tuần từ Thứ 2 đến Thứ 7
+      var daysEvents = {}; // Lưu các sự kiện theo từng ngày trong tuần
       for (var i = 0; i < weekEvents.length; i++) {
         var event = weekEvents[i];
         var eventDay = event.getStartTime().getDay();
         var startTime = formatTime(event.getStartTime());
         var endTime = formatTime(event.getEndTime());
-        var eventInfo = event.getTitle();
-        if (eventDay >= 1 && eventDay <= 6) {
-          eventDetails[eventDay - 1] += eventInfo;
+        var time = startTime + ' - ' + endTime;
+        var eventInfo = event.getTitle() + ' (' + time + ')';
+
+        if (!daysEvents[eventDay]) {
+          daysEvents[eventDay] = [];
         }
+        daysEvents[eventDay].push(eventInfo);
       }
 
-      // Tạo một mảng con để lưu thông tin về tuần
-      var eventInfo = [
-        weekNumber,
-        formatDate(weekStartDate),
-        formatDate(weekEndDate),
-        startTime,
-        endTime,
-      ].concat(eventDetails);
-
-      // Thêm mảng con vào mảng chính
-      schedule.push(eventInfo);
+      var maxEventsInADay = Math.max(
+        ...Object.values(daysEvents).map((events) => events.length)
+      );
+      for (var j = 0; j < maxEventsInADay; j++) {
+        var eventDetails = ['', '', '', '', '', ''];
+        for (var day in daysEvents) {
+          if (daysEvents[day][j]) {
+            eventDetails[day - 1] = daysEvents[day][j];
+          }
+        }
+        var eventInfo = [
+          weekNumber,
+          formatDate(weekStartDate),
+          formatDate(weekEndDate),
+          '', // Placeholder for time
+        ].concat(eventDetails);
+        schedule.push(eventInfo);
+      }
     }
 
     // Tăng số tuần và ngày hiện tại lên một tuần
@@ -73,16 +82,59 @@ function downloadCalendar() {
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Calendar');
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Schedule');
 
   sheet.clear();
 
   // Ghi dữ liệu mới vào sheet
   if (schedule.length > 0) {
     sheet
-      .getRange(3, 1, schedule.length, schedule[0].length)
+      .getRange(6, 1, schedule.length, schedule[0].length)
       .setValues(schedule);
+
+    // Merge cells cho các cột tuần, ngày bắt đầu, ngày kết thúc nếu cần thiết
+    var currentWeek = schedule[1][0];
+    var startRow = 7;
+    for (var row = 8; row < schedule.length + 6; row++) {
+      if (schedule[row - 6][0] != currentWeek) {
+        if (row - startRow > 1) {
+          sheet.getRange(startRow, 1, row - startRow, 1).merge();
+          sheet.getRange(startRow, 2, row - startRow, 1).merge();
+          sheet.getRange(startRow, 3, row - startRow, 1).merge();
+        }
+        startRow = row;
+        currentWeek = schedule[row - 6][0];
+      }
+    }
+    // Merge the last batch if necessary
+    if (schedule.length + 6 - startRow > 1) {
+      sheet.getRange(startRow, 1, schedule.length + 6 - startRow, 1).merge();
+      sheet.getRange(startRow, 2, schedule.length + 6 - startRow, 1).merge();
+      sheet.getRange(startRow, 3, schedule.length + 6 - startRow, 1).merge();
+    }
   }
+
+  // Merge cells and set values for the title
+  var title1 = sheet.getRange(1, 1, 1, 11).merge();
+  var title2 = sheet.getRange(2, 1, 1, 11).merge();
+  var title3 = sheet.getRange(3, 1, 1, 11).merge();
+  var title4 = sheet.getRange(4, 1, 1, 11).merge();
+
+  // Set values
+  title1.setValue('TRUNG TÂM CÔNG NGHỆ PHẦN MỀM ĐẠI HỌC CẦN THƠ');
+  title2.setValue('CANTHO UNIVERSITY SOFTWARE CENTER');
+  title3.setValue(
+    'Khu III, Đại học Cần Thơ - 01 Lý Tự Trọng, TP. Cần Thơ - Tel: 0292.3731072 & Fax: 0292.3731071 - Email: cusc@ctu.edu.vn'
+  );
+  title4.setValue('THỜI KHÓA BIỂU');
+
+  // Apply formatting
+  var fontItalic = SpreadsheetApp.newTextStyle().setItalic(true).build();
+
+  title1.setHorizontalAlignment('center').setFontWeight('bold').setFontSize(11);
+  title2.setHorizontalAlignment('center').setFontWeight('bold').setFontSize(17);
+  title4.setHorizontalAlignment('center').setFontWeight('bold').setFontSize(18);
+  title3.setHorizontalAlignment('center').setTextStyle(fontItalic);
 }
 
 // Hàm để định dạng ngày

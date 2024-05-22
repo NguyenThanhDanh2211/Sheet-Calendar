@@ -8,7 +8,7 @@ function onOpen(e) {
     .addSubMenu(
       SpreadsheetApp.getUi()
         .createMenu('Quản lý lịch Calendar')
-        .addItem('Xếp thời khóa biểu tự động', 'Show_Sidebar_createCalendar')
+        .addItem('Tạo TKB mẫu theo Học kỳ', 'Show_Sidebar_createCalendar')
         .addItem('Download thời khóa biểu', 'downloadCalendar')
     )
     .addToUi();
@@ -55,7 +55,7 @@ function createEvent(form) {
                 parseInt(form.startTime.split(':')[1]))
           );
 
-          var eventTitle = subject + '-TL' + ('0' + sessionCount).slice(-2); // Tạo tiêu đề sự kiện với ký tự -TL0x
+          var eventTitle = subject + '_TL' + ('0' + sessionCount).slice(-2); // Tạo tiêu đề sự kiện với ký tự -TL0x
 
           calendar.createEvent(eventTitle, startDate, eventEnd);
 

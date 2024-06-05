@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <!-- Import Google Icon Font -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <!-- Compiled and minified CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <?!= include("style"); ?>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div id="notification"></div>
+        <div class="input-field col s12">
+          <i class="material-icons prefix">title</i>
+          <input id="name" type="text" class="validate" />
+          <label for="name">Tên lớp</label>
+        </div>
+
+        <div class="input-field col s12">
+          <i class="material-icons prefix">school</i>
+          <select id="semester" name="semester">
+            <option value="HK1">HK1</option>
+            <option value="HK2">HK2</option>
+            <option value="HK3">HK3</option>
+            <option value="HK4">HK4</option>
+          </select>
+          <label for="semester">Học kỳ</label>
+        </div>
+
+        <div class="input-field col s12">
+          <i class="material-icons prefix">calendar_month</i>
+          <input id="startDate" type="date" class="validate" />
+          <label for="startDate">Ngày bắt đầu</label>
+        </div>
+        <div class="input-field col s12">
+          <i class="material-icons prefix">timer</i>
+          <input id="startHour" type="time" class="validate" />
+          <label for="startHour">Giờ bắt đầu</label>
+        </div>
+
+        <p style="margin-left: 25px; margin-bottom: 5px">Chọn ngày học:</p>
+        <div class="input-field col s12" style="margin: 5px">
+          <div style="margin: 5px">
+            <label>
+              <input
+                type="radio"
+                name="ngayhoc"
+                class="filled-in"
+                value="day2"
+                checked
+              />
+              <span>T2 T3 T4 T5 T6</span>
+            </label>
+          </div>
+          <div style="margin: 5px">
+            <label>
+              <input
+                type="radio"
+                name="ngayhoc"
+                class="filled-in"
+                value="days246"
+              />
+              <span>T2 T4 T6</span>
+            </label>
+          </div>
+          <div style="margin: 5px">
+            <label>
+              <input
+                type="radio"
+                name="ngayhoc"
+                class="filled-in"
+                value="days357"
+              />
+              <span>T3 T5 T7</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Bổ sung phần này -->
+        <div id="day2AdditionalFields" style="display: none">
+          <div class="input-field col s12">
+            <hr />
+            <p>Học 2 buổi/ngày (nếu có)</p>
+          </div>
+
+          <div class="input-field col s12">
+            <i class="material-icons prefix">timer</i>
+            <input id="startHour2" type="time" class="validate" />
+            <label for="startHour2">Giờ bắt đầu (buổi 2)</label>
+          </div>
+
+          <div class="input-field col s12">
+            <i class="material-icons prefix">edit_calendar</i>
+            <input id="course" type="text" class="validate" />
+            <label for="course">STT môn học</label>
+          </div>
+        </div>
+
+        <div class="input-field col s12" style="margin-top: 5px">
+          <i class="material-icons prefix">location_on</i>
+          <input id="theoryRoom" type="text" class="validate" />
+          <label for="theoryRoom">Phòng học lý thuyết</label>
+        </div>
+
+        <div class="input-field col s12" style="margin-top: 5px">
+          <i class="material-icons prefix">location_on</i>
+          <input id="practiceRoom" type="text" class="validate" />
+          <label for="practiceRoom">Phòng học thực hành</label>
+        </div>
+
+        <div class="input-field col s12"><hr /></div>
+
+        <div class="input-field col s12" style="margin-top: 3px">
+          <i class="material-icons prefix">edit_calendar</i>
+          <input id="restDay" type="text" class="validate" />
+          <label for="restDay">Thêm ngày nghỉ (nếu có)</label>
+        </div>
+
+        <div class="input-field col s12"><hr /></div>
+
+        <div class="input-field col s12">
+          <i class="material-icons prefix">more_time</i>
+          <input id="startHourMore" type="time" class="validate" />
+          <label for="startHourMore">Giờ học khác</label>
+        </div>
+
+        <div class="input-field col s12">
+          <i class="material-icons prefix">edit_calendar</i>
+          <input id="startHourMoreW" type="text" class="validate" />
+          <label for="startHourMoreW">Từ tuần - đến tuần</label>
+        </div>
+
+        <div class="col s12">
+          <button
+            id="addEvent"
+            class="btn waves-effect waves-light"
+            type="submit"
+            name="action"
+          >
+            Thêm
+            <i class="material-icons right">send</i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
+
+        // Hiển thị hoặc ẩn các trường bổ sung dựa trên lựa chọn ngày học
+        var radioButtons = document.querySelectorAll('input[name="ngayhoc"]');
+        var additionalFields = document.getElementById('day2AdditionalFields');
+
+        radioButtons.forEach(function (radio) {
+          radio.addEventListener('change', function () {
+            if (radio.value === 'day2') {
+              additionalFields.style.display = 'block';
+            } else {
+              additionalFields.style.display = 'none';
+            }
+          });
+        });
+
+        // Kiểm tra lần đầu khi trang tải xong
+        if (
+          document.querySelector('input[name="ngayhoc"]:checked').value ===
+          'day2'
+        ) {
+          additionalFields.style.display = 'block';
+        }
+      });
+
+      var btnAdd = document.getElementById('addEvent');
+      btnAdd.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        var formData = {
+          name: document.getElementById('name').value,
+          semester: document.getElementById('semester').value,
+          startDate: document.getElementById('startDate').value,
+          startHour: document.getElementById('startHour').value,
+          ngayhoc: document.querySelector('input[name="ngayhoc"]:checked')
+            .value,
+          theoryRoom: document.getElementById('theoryRoom').value,
+          practiceRoom: document.getElementById('practiceRoom').value,
+          restDay: document.getElementById('restDay').value,
+          startHourMore: document.getElementById('startHourMore').value,
+          startHourMoreW: document.getElementById('startHourMoreW').value,
+          // Thêm dữ liệu cho các trường bổ sung nếu ngày học là day2
+          startHour2: document.getElementById('startHour2')
+            ? document.getElementById('startHour2').value
+            : '',
+          course: document.getElementById('course')
+            ? document.getElementById('course').value
+            : '',
+        };
+
+        google.script.run
+          .withSuccessHandler(function () {
+            document.getElementById('notification').innerHTML =
+              '<p>Tạo thời khóa biểu thành công!<p>';
+          })
+          .CreateTemplateSchedule(formData);
+      });
+    </script>
+  </body>
+</html>
